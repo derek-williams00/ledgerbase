@@ -1,22 +1,29 @@
-#ifndef __LEDGER_H
-#define __LEDGER_H
+#ifndef __LEDGERS_H
+#define __LEDGERS_H
 
 
 struct ledger;
+struct charter;
 
-struct ledger* ledger_create();
+struct ledger* ledger_create(const struct charter* p_charter);
 void ledger_free(struct ledger* p_ledger);
 
 
+struct ledger_id;
+
+struct ledger_id* ledger_get_id(struct ledger* ledger);
+int equal_ledger_ids(struct ledger_id* p_a, struct ledger_id* p_b);
 
 
-struct charter;
 struct event;
 
 struct charter* charter_create(int n_ins, char* ins);
 void charter_free(struct charter* p_charter)
 
+struct charter* get_original_charter(struct ledger* p_ledger);
+struct charter* get_charter(struct ledger* p_ledger);
 
+int is_relevant(struct ledger* p_ledger, struct event* p_event);
 
 
 /*
@@ -46,7 +53,11 @@ struct chapter* chapter_create(int n_events, struct event* events);
 
 
 /*
+ * Check a chapter in to a ledger.
+ *
  * This should return 0 if it is not valid.
+ * Other return values in other cases mean the chapter is valid but still
+ * may not hold.
  */
 int check(struct history* p_history, struct chapter* p_chapter);
 
@@ -54,22 +65,6 @@ struct chapter* get_chapter(struct history* p_history, int chapter_n);
 
 
 
-
-
-/*
- * The registry is a construct of a ledger's state.
- * It is like the database of a ledger.
- * It's entries are mutable and therefore their state is a function of time.
- */
-struct registry;
-
-/*
- * An entry holds data in a registry.
- */
-struct entry;
-
-
-const struct entry* get_entry(struct registry* registry, int (*identify)(const struct entry* entry));
 
 
 /*
@@ -91,12 +86,32 @@ struct effect;
 struct effect* effect_create(struct cause* cause, struct event* event);
 
 
+
 /*
  * This shows all of the effects that lead up to a particular state.
  *
  * A brief contains less data than a history but can still generate ledger state.
  */
 struct brief;
+
+struct brief* brief_create(struct history* p_history, int chapter_n);
+
+
+/*
+ * The registry is a construct of a ledger's state.
+ * It is like the database of a ledger.
+ * It's entries are mutable and therefore their state is a function of time.
+ */
+struct registry;
+
+/*
+ * An entry holds data in a registry.
+ * Would use the word "register" but that is a keyword in C so I had to settle.
+ */
+struct entry;
+
+
+const struct entry* get_entry(struct registry* registry, int (*identify)(const struct entry* entry));
 
 
 /*
@@ -108,11 +123,12 @@ struct brief;
 struct state;
 
 struct state* state_create(struct history* p_history, int chapter_n);
-struct state* state_create(struct brief* brief);
-
-
-
-
+struct state* state_create(struct brief* p_brief);
+struct registry* state_get_registry(struct state* p_state, const char* name);
+struct state* state_copy(const struct state* p_state);
+void state_apply(struct state* p_state, const struct effect* p_effect);
+void state_apply(struct state* p_state, const struct brief* p_brief);
+struct state* state_next(const struct state* p_state, const struct brief* p_brief);
 
 
 
