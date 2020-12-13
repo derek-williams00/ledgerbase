@@ -1,0 +1,27 @@
+
+
+ledgers are run on individual machines.
+
+
+A ledger is a construct, a ritual performed by zero or more parties.
+
+
+
+The identity of a ledger, that which seperates one ledger from another, is called its basis.
+
+
+
+The basis of a ledger has two parts, the original charter and initial conditions.
+
+The charter can change just like the rest of the the state that a ledger has.
+
+
+
+
+
+The ledger has a history which is organized into chapters.
+
+Each chapter covers a span of time.
+
+
+
